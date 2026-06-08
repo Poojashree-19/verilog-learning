@@ -16,10 +16,16 @@ This repository contains my Verilog HDL learning journey.
 - GTKWave
 
 ## Progress
-- [ ] Logic Gates
-- [ ] Half Adder
-- [ ] Full Adder
-- [ ] Multiplexers
-- [ ] D Flip-Flop
-- [ ] Counter
-- [ ] FSM
+- [x] Logic Gates
+- [x] Half Adder
+- [x] Full Adder
+- [x] Multiplexers
+- [x] D Flip-Flop
+- [x] Counter
+- [x] FSM
+
+## Upcoming Projects
+- [ ] 8-bit ALU
+- [ ] Single-Cycle RISC-V Processor
+- [ ] FIFO Design & Verification
+- [ ] SPI Master-Slave Communication
