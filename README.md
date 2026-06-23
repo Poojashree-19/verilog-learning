@@ -25,7 +25,7 @@ This repository contains my Verilog HDL learning journey.
 - [x] FSM
 
 ## Upcoming Projects
-- [ ] 8-bit ALU
+- [x] 8-bit ALU
 - [ ] Single-Cycle RISC-V Processor
 - [ ] FIFO Design & Verification
 - [ ] SPI Master-Slave Communication
