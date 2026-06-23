@@ -1,4 +1,4 @@
-# Pipelined 8-bit ALU with Full Flag Unit and Hazard Awareness
+# Designed and verified a 2-stage pipelined 8-bit ALU with 5 status flags, flag register, stall control, and flush support using SystemVerilog
 
 ## Project Overview
 
