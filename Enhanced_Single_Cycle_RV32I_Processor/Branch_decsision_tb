@@ -1,0 +1,98 @@
+`timescale 1ns/1ps
+
+module branch_decision_tb;
+
+    // ---------------------------------------------
+    // Testbench Signals
+    // ---------------------------------------------
+
+    logic Branch;
+    logic Zero;
+
+    logic PCSrc;
+
+    // ---------------------------------------------
+    // Instantiate Design Under Test (DUT)
+    // ---------------------------------------------
+
+    branch_decision dut (
+
+        .Branch(Branch),
+        .Zero(Zero),
+        .PCSrc(PCSrc)
+
+    );
+
+    // ---------------------------------------------
+    // Monitor Signals
+    // ---------------------------------------------
+
+    initial begin
+
+        $monitor("Time=%0t | Branch=%b | Zero=%b | PCSrc=%b",
+                  $time, Branch, Zero, PCSrc);
+
+    end
+
+    // ---------------------------------------------
+    // Test Cases
+    // ---------------------------------------------
+
+    initial begin
+
+        $dumpfile("branch_decision.vcd");
+        $dumpvars(0, branch_decision_tb);
+
+        $display("======================================");
+        $display("Starting Branch Decision Test");
+        $display("======================================");
+
+        // -----------------------------------------
+        // Test Case 1
+        // Branch = 0, Zero = 0
+        // Expected PCSrc = 0
+        // -----------------------------------------
+
+        Branch = 0;
+        Zero   = 0;
+        #10;
+
+        // -----------------------------------------
+        // Test Case 2
+        // Branch = 0, Zero = 1
+        // Expected PCSrc = 0
+        // -----------------------------------------
+
+        Branch = 0;
+        Zero   = 1;
+        #10;
+
+        // -----------------------------------------
+        // Test Case 3
+        // Branch = 1, Zero = 0
+        // Expected PCSrc = 0
+        // -----------------------------------------
+
+        Branch = 1;
+        Zero   = 0;
+        #10;
+
+        // -----------------------------------------
+        // Test Case 4
+        // Branch = 1, Zero = 1
+        // Expected PCSrc = 1
+        // -----------------------------------------
+
+        Branch = 1;
+        Zero   = 1;
+        #10;
+
+        $display("======================================");
+        $display("Branch Decision Test Completed");
+        $display("======================================");
+
+        $finish;
+
+    end
+
+endmodule
