@@ -1,23 +1,33 @@
-module register_file(
+module Register_file(
 
     input  logic        clk,
     input  logic        reset,
 
+    input  logic        reg_write,
+
     input  logic [4:0]  rs1,
     input  logic [4:0]  rs2,
-
     input  logic [4:0]  rd,
+
     input  logic [31:0] write_data,
-    input  logic        reg_write,
 
     output logic [31:0] read_data1,
     output logic [31:0] read_data2
 
 );
 
+    // -------------------------------------------------
+    // 32 Registers (x0 - x31)
+    // Each register is 32 bits wide
+    // -------------------------------------------------
+
     logic [31:0] registers [0:31];
 
     integer i;
+
+    // -------------------------------------------------
+    // Write Operation
+    // -------------------------------------------------
 
     always_ff @(posedge clk) begin
 
@@ -30,12 +40,17 @@ module register_file(
 
         else begin
 
+            // x0 is always zero, so it cannot be written
             if (reg_write && (rd != 5'd0))
                 registers[rd] <= write_data;
 
         end
 
     end
+
+    // -------------------------------------------------
+    // Read Operations
+    // -------------------------------------------------
 
     assign read_data1 = (rs1 == 5'd0) ? 32'd0 : registers[rs1];
 
