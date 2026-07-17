@@ -1,19 +1,26 @@
-# 32-bit Single-Cycle RV32I Processor
+# 32-bit Single-Cycle RV32I Processor in SystemVerilog
 
 ## Overview
 
-This project implements a 32-bit Single-Cycle RISC-V (RV32I) processor in SystemVerilog.
+This project implements a **32-bit Single-Cycle RISC-V (RV32I) Processor** using **SystemVerilog**. The processor supports the core RV32I instruction set, including arithmetic, logical, memory access, branch, and immediate instructions.
 
-The processor executes one instruction per clock cycle and supports arithmetic, logical, memory access, branch instructions, a custom AVG instruction, and architectural performance counters.
+In addition, the processor has been enhanced with:
+
+- A **custom AVG instruction**
+- **Architectural Performance Counters** to monitor processor execution statistics
+
+The design was verified using a SystemVerilog testbench and waveform analysis in EDA Playground.
 
 ---
 
 ## Features
 
+- 32-bit Single-Cycle RV32I Processor
+- Modular RTL Design
 - Program Counter (PC)
 - Next PC Logic
 - Instruction Memory
-- Register File (32 × 32-bit)
+- Register File (32 × 32-bit Registers)
 - Immediate Generator
 - Main Control Unit
 - ALU Control Unit
@@ -21,11 +28,10 @@ The processor executes one instruction per clock cycle and supports arithmetic, 
 - Data Memory
 - Branch Decision Logic
 - Writeback Multiplexer
-- Datapath Integration
+- Complete Datapath Integration
 - Processor Top Module
-- Testbench
-- Custom AVG Instruction
-- Architectural Performance Counters
+- SystemVerilog Testbench
+- Waveform Verification
 
 ---
 
@@ -55,12 +61,12 @@ The processor executes one instruction per clock cycle and supports arithmetic, 
 - SRAI
 - SLTI
 
-### Memory
+### Memory Instructions
 
 - LW
 - SW
 
-### Branch
+### Branch Instructions
 
 - BEQ
 - BNE
@@ -69,60 +75,59 @@ The processor executes one instruction per clock cycle and supports arithmetic, 
 - BLTU
 - BGEU
 
-### Custom
+---
 
+## Custom Instruction
+
+### AVG (Average)
+
+A custom instruction was added using a custom RISC-V opcode.
+
+### Operation
+
+```text
 AVG rd, rs1, rs2
 
-```
 rd = (rs1 + rs2) / 2
+```
+
+Example:
+
+```text
+AVG x12, x10, x11
+```
+
+If
+
+```text
+x10 = 20
+x11 = 10
+```
+
+Then
+
+```text
+x12 = 15
 ```
 
 ---
 
-## Performance Counters
+## Architectural Performance Counters
+
+The processor includes built-in performance counters to monitor execution.
 
 - Cycle Counter
 - Instruction Counter
 - Branch Counter
-- Memory Counter
-- AVG Instruction Counter
+- Memory Operation Counter
+- Custom AVG Instruction Counter
 
----
+Example Output
 
-## Tools Used
-
-- SystemVerilog
-- Icarus Verilog
-- GTKWave / EPWave
-- EDA Playground
-
----
-
-## Project Structure
-
-```
-program_counter
-next_pc_logic
-instruction_memory
-register_file
-immediate_generator
-main_control_unit
-alu_control
-alu_32bit
-data_memory
-branch_decision
-writeback_mux
-performance_counters
-datapath
-processor_top
-processor_top_tb
-```
-
----
-
-## Sample Output
-
-```
+```text
+----------------------------------------
+Simulation Finished
+----------------------------------------
 Cycle Count       = 23
 Instruction Count = 23
 Branch Count      = 1
@@ -132,11 +137,109 @@ AVG Count         = 1
 
 ---
 
-## Future Improvements
+## Project Structure
 
-- Five-stage pipelined processor
-- Hazard detection
-- Forwarding unit
-- Branch prediction
-- CSR support
-- Interrupt handling
+```text
+RV32I-Single-Cycle-Processor/
+
+├── rv32i_processor.sv
+├── processor_top_tb.sv
+├── README.md
+├── LICENSE
+└── screenshots/
+    └── waveform.png
+```
+
+---
+
+## Design Modules
+
+- Program Counter
+- Next PC Logic
+- Instruction Memory
+- Register File
+- Immediate Generator
+- Main Control Unit
+- ALU Control Unit
+- 32-bit ALU
+- Data Memory
+- Branch Decision Unit
+- Writeback Multiplexer
+- Performance Counters
+- Datapath
+- Processor Top
+
+---
+
+## Simulation
+
+The processor was verified using a custom SystemVerilog testbench.
+
+Simulation includes:
+
+- Arithmetic Instructions
+- Logical Instructions
+- Memory Access
+- Branch Execution
+- Custom AVG Instruction
+- Performance Counter Verification
+
+---
+
+## Waveform
+
+Add your waveform screenshot here.
+
+```markdown
+![Waveform](screenshots/waveform.png)
+```
+
+---
+
+## Tools Used
+
+- SystemVerilog
+- Icarus Verilog
+- EDA Playground
+- EPWave / GTKWave
+- GitHub
+
+---
+
+## Skills Demonstrated
+
+- RTL Design
+- Digital Logic Design
+- Computer Architecture
+- RISC-V ISA
+- Datapath Design
+- Control Unit Design
+- Custom Instruction Design
+- Performance Monitoring
+- SystemVerilog
+- Functional Verification
+- Testbench Development
+- Waveform Analysis
+
+---
+
+## Future Enhancements
+
+- Five-stage Pipelined RV32I Processor
+- Hazard Detection Unit
+- Data Forwarding Unit
+- Branch Prediction
+- CSR (Control and Status Registers)
+- Interrupt and Exception Handling
+- Instruction & Data Cache Support
+
+---
+
+## Author
+
+**Poojashree DH**
+
+Electrical and Electronics Engineering  
+PES University
+
+GitHub: https://github.com/Poojashree-19
