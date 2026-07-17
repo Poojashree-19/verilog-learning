@@ -2,11 +2,12 @@ module alu_32bit(
 
     input  logic [31:0] operand_a,
     input  logic [31:0] operand_b,
-
-    input  logic [3:0] alu_control,
+    input  logic [3:0]  alu_control,
 
     output logic [31:0] result,
-    output logic        Zero
+    output logic        Zero,
+    output logic        less_than,
+    output logic        less_than_u
 
 );
 
@@ -34,27 +35,28 @@ always_comb begin
         4'b0100:
             result = operand_a ^ operand_b;
 
-        // Shift Left Logical (SLL)
+        // SLL
         4'b0101:
             result = operand_a << operand_b[4:0];
 
-        // Shift Right Logical (SRL)
+        // SRL
         4'b0110:
             result = operand_a >> operand_b[4:0];
 
-        // Shift Right Arithmetic (SRA)
+        // SRA
         4'b0111:
             result = $signed(operand_a) >>> operand_b[4:0];
 
-        // Set Less Than (SLT)
+        // SLT
         4'b1000:
-            result = ($signed(operand_a) < $signed(operand_b)) ? 32'd1 : 32'd0;
+            result = ($signed(operand_a) < $signed(operand_b))
+                     ? 32'd1 : 32'd0;
 
-        // Set Less Than Unsigned (SLTU)
+        // SLTU
         4'b1001:
-            result = (operand_a < operand_b) ? 32'd1 : 32'd0;
+            result = (operand_a < operand_b)
+                     ? 32'd1 : 32'd0;
 
-        // Default
         default:
             result = 32'd0;
 
@@ -62,7 +64,10 @@ always_comb begin
 
 end
 
-// Zero Flag
-assign Zero = (result == 32'd0);
+assign Zero        = (result == 32'd0);
+
+assign less_than   = ($signed(operand_a) < $signed(operand_b));
+
+assign less_than_u = (operand_a < operand_b);
 
 endmodule
