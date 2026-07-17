@@ -2,94 +2,130 @@
 
 module branch_decision_tb;
 
-    // ---------------------------------------------
-    // Testbench Signals
-    // ---------------------------------------------
-
     logic Branch;
+    logic [2:0] funct3;
+
     logic Zero;
+    logic less_than;
+    logic less_than_u;
 
     logic PCSrc;
 
-    // ---------------------------------------------
-    // Instantiate Design Under Test (DUT)
-    // ---------------------------------------------
-
-    branch_decision dut (
+    // DUT
+    branch_decision uut (
 
         .Branch(Branch),
+        .funct3(funct3),
         .Zero(Zero),
+        .less_than(less_than),
+        .less_than_u(less_than_u),
         .PCSrc(PCSrc)
 
     );
 
-    // ---------------------------------------------
-    // Monitor Signals
-    // ---------------------------------------------
-
     initial begin
-
-        $monitor("Time=%0t | Branch=%b | Zero=%b | PCSrc=%b",
-                  $time, Branch, Zero, PCSrc);
-
-    end
-
-    // ---------------------------------------------
-    // Test Cases
-    // ---------------------------------------------
-
-    initial begin
-
-        $dumpfile("branch_decision.vcd");
+      
+      
+       // Generate waveform
+        $dumpfile("branch_decision_tb.vcd");
         $dumpvars(0, branch_decision_tb);
 
-        $display("======================================");
-        $display("Starting Branch Decision Test");
-        $display("======================================");
+        $display("Time\tBranch\tfunct3\tZero\tLT\tLTU\tPCSrc");
 
-        // -----------------------------------------
-        // Test Case 1
-        // Branch = 0, Zero = 0
-        // Expected PCSrc = 0
-        // -----------------------------------------
+        $monitor("%0t\t%b\t%b\t%b\t%b\t%b\t%b",
+                 $time,
+                 Branch,
+                 funct3,
+                 Zero,
+                 less_than,
+                 less_than_u,
+                 PCSrc);
 
-        Branch = 0;
-        Zero   = 0;
-        #10;
-
-        // -----------------------------------------
-        // Test Case 2
-        // Branch = 0, Zero = 1
-        // Expected PCSrc = 0
-        // -----------------------------------------
-
-        Branch = 0;
-        Zero   = 1;
-        #10;
-
-        // -----------------------------------------
-        // Test Case 3
-        // Branch = 1, Zero = 0
-        // Expected PCSrc = 0
-        // -----------------------------------------
+        //--------------------------------------------------
+        // BEQ
+        //--------------------------------------------------
 
         Branch = 1;
-        Zero   = 0;
+        funct3 = 3'b000;
+
+        Zero = 1;
+        less_than = 0;
+        less_than_u = 0;
         #10;
 
-        // -----------------------------------------
-        // Test Case 4
-        // Branch = 1, Zero = 1
-        // Expected PCSrc = 1
-        // -----------------------------------------
-
-        Branch = 1;
-        Zero   = 1;
+        Zero = 0;
         #10;
 
-        $display("======================================");
-        $display("Branch Decision Test Completed");
-        $display("======================================");
+        //--------------------------------------------------
+        // BNE
+        //--------------------------------------------------
+
+        funct3 = 3'b001;
+
+        Zero = 0;
+        #10;
+
+        Zero = 1;
+        #10;
+
+        //--------------------------------------------------
+        // BLT
+        //--------------------------------------------------
+
+        funct3 = 3'b100;
+
+        less_than = 1;
+        #10;
+
+        less_than = 0;
+        #10;
+
+        //--------------------------------------------------
+        // BGE
+        //--------------------------------------------------
+
+        funct3 = 3'b101;
+
+        less_than = 0;
+        #10;
+
+        less_than = 1;
+        #10;
+
+        //--------------------------------------------------
+        // BLTU
+        //--------------------------------------------------
+
+        funct3 = 3'b110;
+
+        less_than_u = 1;
+        #10;
+
+        less_than_u = 0;
+        #10;
+
+        //--------------------------------------------------
+        // BGEU
+        //--------------------------------------------------
+
+        funct3 = 3'b111;
+
+        less_than_u = 0;
+        #10;
+
+        less_than_u = 1;
+        #10;
+
+        //--------------------------------------------------
+        // Branch Disabled
+        //--------------------------------------------------
+
+        Branch = 0;
+        funct3 = 3'b000;
+        Zero = 1;
+        less_than = 1;
+        less_than_u = 1;
+        #10;
 
         $finish;
 
