@@ -45,45 +45,41 @@ endmodule
 module instruction_memory(
 
     input  logic [31:0] address,
-
     output logic [31:0] instruction
 
 );
 
-    // -------------------------------------------------
-    // 256 x 32-bit Instruction Memory
-    // -------------------------------------------------
-
     logic [31:0] memory [0:255];
-
     integer i;
-
-    // -------------------------------------------------
-    // Initialize Instruction Memory
-    // -------------------------------------------------
 
     initial begin
 
-        // Initialize all memory locations to NOP
-        for (i = 0; i < 256; i = i + 1)
-            memory[i] = 32'h00000013;   // NOP (ADDI x0, x0, 0)
+        // Fill entire memory with NOPs
+        for(i=0;i<256;i=i+1)
+            memory[i] = 32'h00000013;
 
-        // Load Program
-        memory[0] = 32'h00100093;   // ADDI x1, x0, 1
-        memory[1] = 32'h00208133;   // ADD  x2, x1, x2
-        memory[2] = 32'h00012083;   // LW   x1, 0(x2)
-        memory[3] = 32'h00208463;   // BEQ  x1, x2, Branch
+        // -------------------------------------------------
+        // Test Program
+        // -------------------------------------------------
+
+        memory[0]  = 32'h00500093;   // ADDI x1,x0,5
+        memory[1]  = 32'h00A00113;   // ADDI x2,x0,10
+        memory[2]  = 32'h002081B3;   // ADD  x3,x1,x2
+        memory[3]  = 32'h40110233;   // SUB  x4,x2,x1
+        memory[4]  = 32'h0020F2B3;   // AND  x5,x1,x2
+        memory[5]  = 32'h0020E333;   // OR   x6,x1,x2
+        memory[6]  = 32'h00302023;   // SW   x3,0(x0)
+        memory[7]  = 32'h00002383;   // LW   x7,0(x0)
+        memory[8]  = 32'h00420463;   // BEQ  x1,x4,+8
+        memory[9]  = 32'h06300413;   // ADDI x8,x0,99 (Skipped)
+        memory[10] = 32'h02A00413;   // ADDI x8,x0,42
+        memory[11] = 32'h00700493;   // ADDI x9,x0,7
 
     end
-
-    // -------------------------------------------------
-    // Read Instruction
-    // -------------------------------------------------
 
     assign instruction = memory[address[31:2]];
 
 endmodule
-
 module Register_file(
 
     input  logic        clk,
@@ -447,40 +443,39 @@ endmodule
 
 module data_memory(
 
-    input  logic        clk,
-    input  logic        MemRead,
-    input  logic        MemWrite,
+    input logic clk,
+    input logic MemRead,
+    input logic MemWrite,
 
-    input  logic [31:0] address,
-    input  logic [31:0] write_data,
+    input logic [31:0] address,
+    input logic [31:0] write_data,
 
     output logic [31:0] read_data
 
 );
 
-    // ---------------------------------------------
-    // Data Memory
-    // 256 locations, each 32 bits wide
-    // ---------------------------------------------
+logic [31:0] memory [0:255];
 
-    logic [31:0] memory [0:255];
+integer i;
 
-    // ---------------------------------------------
-    // Write Operation
-    // ---------------------------------------------
+initial begin
 
-    always_ff @(posedge clk) begin
+    for(i=0;i<256;i=i+1)
+        memory[i]=32'd0;
 
-        if (MemWrite)
-            memory[address[31:2]] <= write_data;
+end
 
-    end
+always_ff @(posedge clk) begin
 
-    // ---------------------------------------------
-    // Read Operation
-    // ---------------------------------------------
+    if(MemWrite)
+        memory[address[31:2]] <= write_data;
 
-    assign read_data = (MemRead) ? memory[address[31:2]] : 32'd0;
+end
+
+assign read_data =
+        (MemRead) ?
+        memory[address[31:2]] :
+        32'd0;
 
 endmodule
 module branch_decision(
