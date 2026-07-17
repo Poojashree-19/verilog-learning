@@ -286,19 +286,28 @@ module alu_control(
 
 always_comb begin
 
+    // Default assignment
+    alu_control = 4'b0000;
+
     case (ALUOp)
 
+        // -------------------------------------------------
         // Memory Instructions (LW, SW)
         // ALU performs ADD
+        // -------------------------------------------------
         2'b00:
             alu_control = 4'b0000;
 
+        // -------------------------------------------------
         // Branch Instructions (BEQ)
         // ALU performs SUB
+        // -------------------------------------------------
         2'b01:
             alu_control = 4'b0001;
 
+        // -------------------------------------------------
         // R-Type Instructions
+        // -------------------------------------------------
         2'b10: begin
 
             case (funct3)
@@ -354,10 +363,57 @@ always_comb begin
 
         end
 
-        // I-Type ALU Instructions (ADDI)
-        2'b11:
-            alu_control = 4'b0000;
+        // -------------------------------------------------
+        // I-Type Instructions
+        // -------------------------------------------------
+        2'b11: begin
 
+            case (funct3)
+
+                // ADDI
+                3'b000:
+                    alu_control = 4'b0000;
+
+                // SLLI
+                3'b001:
+                    alu_control = 4'b0101;
+
+                // SLTI
+                3'b010:
+                    alu_control = 4'b1000;
+
+                // XORI
+                3'b100:
+                    alu_control = 4'b0100;
+
+                // SRLI / SRAI
+                3'b101: begin
+                    if (funct7 == 7'b0000000)
+                        alu_control = 4'b0110;   // SRLI
+                    else if (funct7 == 7'b0100000)
+                        alu_control = 4'b0111;   // SRAI
+                    else
+                        alu_control = 4'b0000;
+                end
+
+                // ORI
+                3'b110:
+                    alu_control = 4'b0011;
+
+                // ANDI
+                3'b111:
+                    alu_control = 4'b0010;
+
+                default:
+                    alu_control = 4'b0000;
+
+            endcase
+
+        end
+
+        // -------------------------------------------------
+        // Default
+        // -------------------------------------------------
         default:
             alu_control = 4'b0000;
 
