@@ -375,11 +375,12 @@ module alu_32bit(
 
     input  logic [31:0] operand_a,
     input  logic [31:0] operand_b,
-
-    input  logic [3:0] alu_control,
+    input  logic [3:0]  alu_control,
 
     output logic [31:0] result,
-    output logic        Zero
+    output logic        Zero,
+    output logic        less_than,
+    output logic        less_than_u
 
 );
 
@@ -407,27 +408,28 @@ always_comb begin
         4'b0100:
             result = operand_a ^ operand_b;
 
-        // Shift Left Logical (SLL)
+        // SLL
         4'b0101:
             result = operand_a << operand_b[4:0];
 
-        // Shift Right Logical (SRL)
+        // SRL
         4'b0110:
             result = operand_a >> operand_b[4:0];
 
-        // Shift Right Arithmetic (SRA)
+        // SRA
         4'b0111:
             result = $signed(operand_a) >>> operand_b[4:0];
 
-        // Set Less Than (SLT)
+        // SLT
         4'b1000:
-            result = ($signed(operand_a) < $signed(operand_b)) ? 32'd1 : 32'd0;
+            result = ($signed(operand_a) < $signed(operand_b))
+                     ? 32'd1 : 32'd0;
 
-        // Set Less Than Unsigned (SLTU)
+        // SLTU
         4'b1001:
-            result = (operand_a < operand_b) ? 32'd1 : 32'd0;
+            result = (operand_a < operand_b)
+                     ? 32'd1 : 32'd0;
 
-        // Default
         default:
             result = 32'd0;
 
@@ -435,8 +437,11 @@ always_comb begin
 
 end
 
-// Zero Flag
-assign Zero = (result == 32'd0);
+assign Zero        = (result == 32'd0);
+
+assign less_than   = ($signed(operand_a) < $signed(operand_b));
+
+assign less_than_u = (operand_a < operand_b);
 
 endmodule
 
@@ -480,14 +485,58 @@ module data_memory(
 endmodule
 module branch_decision(
 
-    input  logic Branch,
-    input  logic Zero,
+    input logic        Branch,
 
-    output logic PCSrc
+    input logic [2:0]  funct3,
+
+    input logic        Zero,
+    input logic        less_than,
+    input logic        less_than_u,
+
+    output logic       PCSrc
 
 );
 
-    assign PCSrc = Branch & Zero;
+always_comb begin
+
+    PCSrc = 1'b0;
+
+    if (Branch) begin
+
+        case (funct3)
+
+            // BEQ
+            3'b000:
+                PCSrc = Zero;
+
+            // BNE
+            3'b001:
+                PCSrc = ~Zero;
+
+            // BLT
+            3'b100:
+                PCSrc = less_than;
+
+            // BGE
+            3'b101:
+                PCSrc = ~less_than;
+
+            // BLTU
+            3'b110:
+                PCSrc = less_than_u;
+
+            // BGEU
+            3'b111:
+                PCSrc = ~less_than_u;
+
+            default:
+                PCSrc = 1'b0;
+
+        endcase
+
+    end
+
+end
 
 endmodule
 module writeback_mux(
@@ -551,6 +600,8 @@ module datapath(
     logic [31:0] alu_result;
 
     logic Zero;
+    logic less_than;      // ADD HERE
+    logic less_than_u;    // ADD HERE
 
     // -------------------------------------------------
     // Data Memory
@@ -677,19 +728,18 @@ module datapath(
     // -------------------------------------------------
     // 32-bit ALU
     // -------------------------------------------------
-
     alu_32bit alu(
 
-        .operand_a(read_data1),
-        .operand_b(alu_input2),
+    .operand_a(read_data1),
+    .operand_b(alu_input2),
+    .alu_control(alu_control),
 
-        .alu_control(alu_control),
+    .result(alu_result),
+    .Zero(Zero),
+    .less_than(less_than),        // ADD THIS
+    .less_than_u(less_than_u)     // ADD THIS
 
-        .result(alu_result),
-        .Zero(Zero)
-
-    );
-
+);
     // -------------------------------------------------
     // Data Memory
     // -------------------------------------------------
@@ -711,15 +761,17 @@ module datapath(
     // -------------------------------------------------
     // Branch Decision
     // -------------------------------------------------
+ branch_decision branch(
 
-    branch_decision branch(
+    .Branch(Branch),
+    .funct3(instruction[14:12]),  // ADD THIS
+    .Zero(Zero),
+    .less_than(less_than),        // ADD THIS
+    .less_than_u(less_than_u),    // ADD THIS
 
-        .Branch(Branch),
-        .Zero(Zero),
+    .PCSrc(PCSrc)
 
-        .PCSrc(PCSrc)
-
-    );
+);
 
     // -------------------------------------------------
     // Writeback MUX
